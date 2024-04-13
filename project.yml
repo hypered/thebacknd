@@ -35,3 +35,9 @@ packages:
           parameters: {}
           annotations: {}
           limits: {}
+        - name: destroy-old
+          binary: false
+          main: ""
+          runtime: python:3.11
+          web: false
+          webSecure: false

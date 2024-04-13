@@ -25,12 +25,16 @@ $ doctl serverless deploy .
 $ doctl serverless functions invoke thebacknd/list
 $ doctl serverless functions invoke thebacknd/create
 $ doctl serverless functions invoke thebacknd/destroy-all
+$ doctl serverless functions invoke thebacknd/destroy-old
 ```
 
 Virtual machines are named `thebacknd-xxx`, where `xxx` is a number. The
 numbers are reused when virtual machines are destroyed. The virtual machines
 are also tagged with "thebacknd". The `list` and `destroy-all` operations only
 work on those machines.
+
+The notion of "old" machines is currently set to 60 minutes. The current
+hard-coded machine type costs less than $0.01 for one hour.
 
 # Configuration
 
