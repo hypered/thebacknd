@@ -1,0 +1,37 @@
+packages:
+    - name: thebacknd
+      shared: false
+      environment:
+        DIGITALOCEAN_ACCESS_TOKEN: "${DIGITALOCEAN_ACCESS_TOKEN}"
+        EMBED_SSH_KEY: "${EMBED_SSH_KEY}"
+      parameters: {}
+      annotations: {}
+      functions:
+        - name: create
+          binary: false
+          main: ""
+          runtime: python:3.11
+          web: false
+          webSecure: false
+          parameters: {}
+          annotations: {}
+          limits:
+            timeout: 5000
+        - name: list
+          binary: false
+          main: ""
+          runtime: python:3.11
+          web: true
+          webSecure: false
+          parameters: {}
+          annotations: {}
+          limits: {}
+        - name: destroy-all
+          binary: false
+          main: ""
+          runtime: python:3.11
+          web: false
+          webSecure: false
+          parameters: {}
+          annotations: {}
+          limits: {}
