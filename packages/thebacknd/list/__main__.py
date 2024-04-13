@@ -11,7 +11,15 @@ def list_droplets():
                 "name": x["name"],
                 "image-name": x["image"]["name"],
                 "image-description": x["image"]["description"],
+                "created_at": x["created_at"]
             }
+            public_ips = [
+                network["ip_address"] for network in x["networks"]["v4"]
+                if network["type"] == "public"
+            ]
+            r[x["id"]]["public_ips"] = public_ips
+            if False:
+                r[x["id"]]["debug"] = x
     return r
 
 def main(args):
