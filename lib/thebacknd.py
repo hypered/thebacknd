@@ -25,7 +25,7 @@ conf.old_minutes = 60
 # Values passed to do_client.droplets.create().
 conf.vm_region = "ams3"
 conf.vm_size = "s-1vcpu-1gb"
-conf.vm_image = "debian-12-x64"
+conf.vm_image = "154099004" # ID of thebacknd-base custom image.
 
 def list_droplets():
     xs = do_client.droplets.list(tag_name="thebacknd")
