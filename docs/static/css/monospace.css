@@ -1,0 +1,124 @@
+body {
+  font-family: monospace;
+  width: 82ch;
+  padding: 0;
+  margin: 1ch 2ch;
+  color: white;
+  background-color: black;
+}
+
+code, pre {
+  padding: 0;
+  margin: 0;
+}
+
+h1 {
+  font-size: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: red;
+}
+
+a.white {
+  color: white;
+}
+
+form {
+  background: #eee;
+  padding: 1ch 2ch;
+}
+label {
+  font-weight: normal;
+}
+fieldset > label {
+  font-weight: bold;
+}
+input[type="radio"] {
+  appearance: none;
+}
+input[type="radio"]:focus {
+  outline: none;
+}
+input[type="radio"]:after {
+  content:"\25CB ";
+}
+input[type="radio"]:checked:after{
+  content:"\25C9 ";
+}
+input[type="checkbox"] {
+  appearance: none;
+  padding: 0;
+  margin: 0;
+  margin-right: 0.15ch;
+}
+input[type="checkbox"]:focus {
+  outline: none;
+}
+input[type="checkbox"]:after {
+  content:"\2610 ";
+}
+input[type="checkbox"]:checked:after{
+  content:"\2611 ";
+}
+select {
+  font-family: monospace;
+  font-size: 100%;
+  color: white;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  margin-left: 1ch;
+  border: 1px solid white;
+  appearance: none;
+  background-color: black;
+}
+select:hover {
+ border-color: white;
+}
+select:focus {
+  border-color: white;
+  color: #222;
+  outline: none;
+}
+select option {
+}
+
+input[type="email"],input[type="password"],input[type="text"] {
+  font-family: monospace;
+  font-size: 100%;
+  color: white;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  appearance: none;
+  background-color: black;
+  width: 64ch;
+}
+
+button,.button {
+  font-family: monospace;
+  font-size: 100%;
+  margin: 0;
+  padding: 1ch 2ch 1ch 2ch;
+  color: white;
+  background: #cc0066;
+  border: 0 none;
+  cursor: pointer;
+}
+button:after,.button:after {
+  content:"  \2192 ";
+}
+
+.smallprint {
+  color: #bbb;
+}
+
+.smallprint a {
+  color: #bbb;
+}
