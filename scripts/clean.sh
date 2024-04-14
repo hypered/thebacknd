@@ -10,3 +10,7 @@ rm -f \
   packages/thebacknd/list/thebacknd.py
 
 find packages/ -type f -name "__deployer__.zip" -delete
+
+# Not related to doctl:
+
+rm -f nixos.qcow2
