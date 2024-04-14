@@ -36,6 +36,13 @@ work on those machines.
 The notion of "old" machines is currently set to 60 minutes. The current
 hard-coded machine type costs less than $0.01 for one hour.
 
+`destroy-old` is scheduled every 20 minutes. This is about 2200 activations per
+month. Scheduled triggers are a free feature of DigitalOcean during the beta
+period, but this may change afterwards.
+
+It can take less than 300ms to run, but will sometimes reach its 3000ms
+timeout. Maybe it would be wise to increase it a bit.
+
 # Configuration
 
 The `.env` file contains an API token for the `pydo` client library. It is not

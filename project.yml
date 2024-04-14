@@ -41,3 +41,8 @@ packages:
           runtime: python:3.11
           web: false
           webSecure: false
+          triggers:
+            - name: trigger-destroy-old
+              sourceType: scheduler
+              sourceDetails:
+                cron: "*/20 * * * *"
