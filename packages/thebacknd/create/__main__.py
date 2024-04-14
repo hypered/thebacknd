@@ -19,9 +19,9 @@ def create_droplet():
     n = smallest_missing_number(numbers)
     droplet_req = {
         "name": "thebacknd-{0}".format(n),
-        "region": "ams3",
-        "size": "s-1vcpu-1gb",
-        "image": "debian-12-x64",
+        "region": thebacknd.conf.vm_region,
+        "size": thebacknd.conf.vm_size,
+        "image": thebacknd.conf.vm_image,
         "ssh_keys": [thebacknd.ssh_key],
         "tags": ["thebacknd"],
     }

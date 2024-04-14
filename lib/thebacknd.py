@@ -4,6 +4,7 @@
 import datetime
 import os
 import pydo
+from types import SimpleNamespace
 
 # Environment variables are set in project.yml. In project.yml, they can be
 # templated from a .env file. Don't write secrets directly in project.yml.
@@ -13,8 +14,18 @@ do_client = pydo.Client(token=os.getenv("DIGITALOCEAN_ACCESS_TOKEN"))
 # already be known from DigitalOcean.
 ssh_key = os.getenv("EMBED_SSH_KEY")
 
+# Things should be configurable. I guess we'll need to update the build.sh
+# scripts to copy some user-defined Python code or JSON file, or whatever
+# later.
+conf = SimpleNamespace()
+
 # After how many minutes a virtual machine must be destroyed.
-old_minutes = 60
+conf.old_minutes = 60
+
+# Values passed to do_client.droplets.create().
+conf.vm_region = "ams3"
+conf.vm_size = "s-1vcpu-1gb"
+conf.vm_image = "debian-12-x64"
 
 def list_droplets():
     xs = do_client.droplets.list(tag_name="thebacknd")
@@ -39,7 +50,7 @@ def list_droplets():
             }
 
             created_at = datetime.datetime.strptime(x["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
-            old_age = datetime.timedelta(minutes=old_minutes)
+            old_age = datetime.timedelta(minutes=conf.old_minutes)
             old_datetime = created_at + old_age
             current_datetime = datetime.datetime.now(datetime.UTC)
             is_too_old = old_datetime < current_datetime
