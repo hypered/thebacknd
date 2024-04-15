@@ -17,10 +17,16 @@ let
     ];
   };
 
+  echo-hello = nixpkgs.writers.writeBashBin "echo-hello" ''
+    set -euo pipefail
+    echo Hello.
+  '';
+
 in rec
   {
     # Build with nix-build -A <attr>
     toplevel = os.config.system.build.toplevel;
     image = os.config.system.build.digitalOceanImage;
     runvm = qemu.config.system.build.vm;
+    binary = echo-hello;
   }

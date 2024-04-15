@@ -28,6 +28,9 @@ def create_droplet():
     user_data_content["destroy_url"] = "https://faas-ams3-2a2df116.doserverless.co/api/v1/web/fn-85df16d9-63e4-4388-875f-28a44e683171/thebacknd/destroy-self"
 
     user_data_content["nix_toplevel"] = thebacknd.conf.nix_toplevel
+    # TODO We really need a better job description format that those
+    # env. vars.
+    #user_data_content["nix_binary"] = "/nix/store/gzxvv5ihacrya9s2y8sskjirajk546p6-echo-hello/bin/echo-hello"
     user_data_content["nix_cache"] = thebacknd.conf.nix_cache
     user_data_content["nix_trusted_key"] = thebacknd.conf.nix_trusted_key
     user_data_content["nix_cache_key_id"] = thebacknd.conf.nix_cache_key_id
