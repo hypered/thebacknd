@@ -15,7 +15,7 @@ def existing_droplet_numbers():
     ns = [int(x["name"].split('-')[-1]) for x in xs["droplets"]]
     return ns 
 
-def create_droplet():
+def create_droplet(nix_toplevel, nix_binary):
     numbers = existing_droplet_numbers()
     n = smallest_missing_number(numbers)
     vm_id = thebacknd.create_vm_id()
@@ -27,10 +27,10 @@ def create_droplet():
     # doctl serverless functions get thebacknd/destroy-self --url
     user_data_content["destroy_url"] = "https://faas-ams3-2a2df116.doserverless.co/api/v1/web/fn-85df16d9-63e4-4388-875f-28a44e683171/thebacknd/destroy-self"
 
-    user_data_content["nix_toplevel"] = thebacknd.conf.nix_toplevel
-    # TODO We really need a better job description format that those
-    # env. vars.
-    #user_data_content["nix_binary"] = "/nix/store/gzxvv5ihacrya9s2y8sskjirajk546p6-echo-hello/bin/echo-hello"
+    if nix_toplevel:
+        user_data_content["nix_toplevel"] = nix_toplevel
+    if nix_binary:
+        user_data_content["nix_binary"] = nix_binary
     user_data_content["nix_cache"] = thebacknd.conf.nix_cache
     user_data_content["nix_trusted_key"] = thebacknd.conf.nix_trusted_key
     user_data_content["nix_cache_key_id"] = thebacknd.conf.nix_cache_key_id
@@ -53,8 +53,11 @@ def create_droplet():
     r = thebacknd.do_client.droplets.create(body=droplet_req)
     return r
 
-def main(args):
-      c = create_droplet()
+def main(event):
+      c = create_droplet(
+          nix_toplevel=event.get("nix_toplevel", None),
+          nix_binary=event.get("nix_binary", None),
+      )
       return {
           "create": c,
       }

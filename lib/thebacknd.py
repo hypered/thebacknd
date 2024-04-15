@@ -33,7 +33,6 @@ conf.old_minutes = 60
 conf.vm_region = "ams3"
 conf.vm_size = "s-1vcpu-1gb"
 conf.vm_image = os.getenv("VM_IMAGE", "debian-12-x64")
-conf.nix_toplevel = os.getenv("NIX_TOPLEVEL")
 conf.nix_cache = os.getenv("NIX_CACHE")
 conf.nix_trusted_key = os.getenv("NIX_TRUSTED_KEY")
 conf.nix_cache_key_id = os.getenv("NIX_CACHE_KEY_ID")
