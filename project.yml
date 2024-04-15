@@ -5,6 +5,12 @@ packages:
         DIGITALOCEAN_ACCESS_TOKEN: "${DIGITALOCEAN_ACCESS_TOKEN}"
         EMBED_SSH_KEY: "${EMBED_SSH_KEY}"
         THEBACKND_SECRET: "${THEBACKND_SECRET}"
+        VM_IMAGE: "${VM_IMAGE}"
+        NIX_TOPLEVEL: "${NIX_TOPLEVEL}"
+        NIX_CACHE: "${NIX_CACHE}"
+        NIX_TRUSTED_KEY: "${NIX_TRUSTED_KEY}"
+        NIX_CACHE_KEY_ID: "${NIX_CACHE_KEY_ID}"
+        NIX_CACHE_KEY_SECRET: "${NIX_CACHE_KEY_SECRET}"
       parameters: {}
       annotations: {}
       functions:

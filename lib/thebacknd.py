@@ -32,7 +32,12 @@ conf.old_minutes = 60
 # Values passed to do_client.droplets.create().
 conf.vm_region = "ams3"
 conf.vm_size = "s-1vcpu-1gb"
-conf.vm_image = "154148040" # ID of thebacknd-base custom image.
+conf.vm_image = os.getenv("VM_IMAGE", "debian-12-x64")
+conf.nix_toplevel = os.getenv("NIX_TOPLEVEL")
+conf.nix_cache = os.getenv("NIX_CACHE")
+conf.nix_trusted_key = os.getenv("NIX_TRUSTED_KEY")
+conf.nix_cache_key_id = os.getenv("NIX_CACHE_KEY_ID")
+conf.nix_cache_key_secret = os.getenv("NIX_CACHE_KEY_SECRET")
 
 # Generate VM ID. (DigitalOcean will also create one, but we'll know it only
 # after spawning a VM. We need one for the per-vm secret before VM creation.)

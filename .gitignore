@@ -1,6 +1,7 @@
 .deployed
 .env
 .envrc
+.env*
 .nimbella
 __deployer__.zip
 __pycache__/

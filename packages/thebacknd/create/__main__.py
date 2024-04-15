@@ -27,6 +27,12 @@ def create_droplet():
     # doctl serverless functions get thebacknd/destroy-self --url
     user_data_content["destroy_url"] = "https://faas-ams3-2a2df116.doserverless.co/api/v1/web/fn-85df16d9-63e4-4388-875f-28a44e683171/thebacknd/destroy-self"
 
+    user_data_content["nix_toplevel"] = thebacknd.conf.nix_toplevel
+    user_data_content["nix_cache"] = thebacknd.conf.nix_cache
+    user_data_content["nix_trusted_key"] = thebacknd.conf.nix_trusted_key
+    user_data_content["nix_cache_key_id"] = thebacknd.conf.nix_cache_key_id
+    user_data_content["nix_cache_key_secret"] = thebacknd.conf.nix_cache_key_secret
+
     droplet_req = {
         "name": "thebacknd-{0}".format(n),
         "region": thebacknd.conf.vm_region,
