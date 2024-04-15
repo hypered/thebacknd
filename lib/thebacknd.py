@@ -2,9 +2,12 @@
 # It is copied at build-time by the build.sh scripts of each "function".
 
 import datetime
+import hmac
+import hashlib
 import os
 import pydo
 from types import SimpleNamespace
+import uuid
 
 # Environment variables are set in project.yml. In project.yml, they can be
 # templated from a .env file. Don't write secrets directly in project.yml.
@@ -13,6 +16,10 @@ do_client = pydo.Client(token=os.getenv("DIGITALOCEAN_ACCESS_TOKEN"))
 # Fingerprint or ID of an SSH key to embed in a created virtual machine. Must
 # already be known from DigitalOcean.
 ssh_key = os.getenv("EMBED_SSH_KEY")
+
+# A secret known from thebacknd, from which to derive per-vm secrets, used by
+# the VMs to request to be destroyed.
+secret = os.getenv("THEBACKND_SECRET")
 
 # Things should be configurable. I guess we'll need to update the build.sh
 # scripts to copy some user-defined Python code or JSON file, or whatever
@@ -25,7 +32,24 @@ conf.old_minutes = 60
 # Values passed to do_client.droplets.create().
 conf.vm_region = "ams3"
 conf.vm_size = "s-1vcpu-1gb"
-conf.vm_image = "154099004" # ID of thebacknd-base custom image.
+conf.vm_image = "154148040" # ID of thebacknd-base custom image.
+
+# Generate VM ID. (DigitalOcean will also create one, but we'll know it only
+# after spawning a VM. We need one for the per-vm secret before VM creation.)
+def create_vm_id():
+    return "thebacknd-{0}".format(uuid.uuid4())
+
+# Per-VM secret derived from the main secret above, associated to a given VM ID.
+def create_killcode(vm_id):
+    secret_bytes = secret.encode()
+    identifier_bytes = vm_id.encode()
+    hmac_obj = hmac.new(secret_bytes, identifier_bytes, hashlib.sha256)
+    per_vm_secret = hmac_obj.hexdigest()
+    return per_vm_secret
+
+def verify_killcode(vm_id, killcode):
+    expected_hmac = create_killcode(vm_id)
+    return hmac.compare_digest(killcode, expected_hmac)
 
 def list_droplets():
     xs = do_client.droplets.list(tag_name="thebacknd")

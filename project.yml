@@ -4,6 +4,7 @@ packages:
       environment:
         DIGITALOCEAN_ACCESS_TOKEN: "${DIGITALOCEAN_ACCESS_TOKEN}"
         EMBED_SSH_KEY: "${EMBED_SSH_KEY}"
+        THEBACKND_SECRET: "${THEBACKND_SECRET}"
       parameters: {}
       annotations: {}
       functions:
@@ -46,3 +47,8 @@ packages:
               sourceType: scheduler
               sourceDetails:
                 cron: "*/20 * * * *"
+        - name: destroy-self
+          binary: false
+          runtime: python:3.11
+          web: true
+          webSecure: false

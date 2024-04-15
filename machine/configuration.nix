@@ -11,5 +11,6 @@
   services.getty.autologinUser = lib.mkDefault "root";
 
   imports = [
+    ./scripts.nix
   ];
 }
