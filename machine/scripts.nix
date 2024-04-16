@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs }:
 let
 current-system = pkgs.runCommandLocal "current-system" {
   script = ../scripts/current-system.sh;
@@ -26,19 +26,20 @@ destroy-system = pkgs.runCommandLocal "destroy-system" {
 
 update-system = pkgs.runCommandLocal "update-system" {
   script = ../scripts/update-system.sh;
-  nativeBuildInputs = [ pkgs.makeWrapper pkgs.curl ];
+  nativeBuildInputs = [ pkgs.makeWrapper ];
 } ''
-  makeWrapper $script $out/bin/update-system \
-    --prefix PATH : ${pkgs.lib.makeBinPath []}
+  install -m755 $script -D $out/bin/update-system
+  patchShebangs $out/bin/update-system
+  wrapProgram $out/bin/update-system \
+    --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.curl pkgs.jq pkgs.nix ]}
 '';
 
 in
 {
-  environment.systemPackages = [
+  inherit
     current-system
     desired-system
     destroy-system
     update-system
-    pkgs.jq
-  ];
+    ;
 }

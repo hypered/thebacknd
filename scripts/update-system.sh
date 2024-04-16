@@ -48,7 +48,14 @@ else
   exit 0
 fi
 
-echo Toplevel is ${TOPLEVEL}.
+echo Desired toplevel is ${TOPLEVEL}.
+
+CURRENT_TOPLEVEL=$(readlink /run/current-system)
+
+if [ "$TOPLEVEL" == "$CURRENT_TOPLEVEL" ]; then
+  echo Toplevel is already current. Exiting.
+  exit 0
+fi
 
 echo Downloading toplevel closure...
 nix-store -r "${TOPLEVEL}" \
