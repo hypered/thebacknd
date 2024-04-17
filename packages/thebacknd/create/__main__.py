@@ -25,6 +25,7 @@ def create_droplet(nix_toplevel, nix_binary):
     user_data_content["vm_id"] = vm_id
     user_data_content["vm_killcode"] = per_vm_secret
     # doctl serverless functions get thebacknd/destroy-self --url
+    # TODO Must be automatically discovered.
     user_data_content["destroy_url"] = "https://faas-ams3-2a2df116.doserverless.co/api/v1/web/fn-85df16d9-63e4-4388-875f-28a44e683171/thebacknd/destroy-self"
 
     if nix_toplevel:
