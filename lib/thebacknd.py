@@ -38,10 +38,12 @@ conf.nix_trusted_key = os.getenv("NIX_TRUSTED_KEY")
 conf.nix_cache_key_id = os.getenv("NIX_CACHE_KEY_ID")
 conf.nix_cache_key_secret = os.getenv("NIX_CACHE_KEY_SECRET")
 
+
 # Generate VM ID. (DigitalOcean will also create one, but we'll know it only
 # after spawning a VM. We need one for the per-vm secret before VM creation.)
 def create_vm_id():
     return "thebacknd-{0}".format(uuid.uuid4())
+
 
 # Per-VM secret derived from the main secret above, associated to a given VM ID.
 def create_killcode(vm_id):
@@ -51,9 +53,11 @@ def create_killcode(vm_id):
     per_vm_secret = hmac_obj.hexdigest()
     return per_vm_secret
 
+
 def verify_killcode(vm_id, killcode):
     expected_hmac = create_killcode(vm_id)
     return hmac.compare_digest(killcode, expected_hmac)
+
 
 def list_droplets():
     xs = do_client.droplets.list(tag_name="thebacknd")
@@ -66,18 +70,21 @@ def list_droplets():
                 "name": x["name"],
                 "image_name": x["image"]["name"],
                 "image_description": x["image"]["description"],
-                "created_at": x["created_at"]
+                "created_at": x["created_at"],
             }
 
             public_ips = [
-                network["ip_address"] for network in x["networks"]["v4"]
+                network["ip_address"]
+                for network in x["networks"]["v4"]
                 if network["type"] == "public"
             ]
             r[x["id"]] |= {
                 "public_ips": public_ips,
             }
 
-            created_at = datetime.datetime.strptime(x["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
+            created_at = datetime.datetime.strptime(
+                x["created_at"], "%Y-%m-%dT%H:%M:%SZ"
+            ).replace(tzinfo=datetime.timezone.utc)
             old_age = datetime.timedelta(minutes=conf.old_minutes)
             old_datetime = created_at + old_age
             current_datetime = datetime.datetime.now(datetime.UTC)
