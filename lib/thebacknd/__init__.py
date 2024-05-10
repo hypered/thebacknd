@@ -98,6 +98,12 @@ def list_droplets():
                 r[x["id"]]["debug"] = x
     return r
 
+def destroy_all_droplets():
+    d = do_client.droplets.destroy_by_tag(tag_name="thebacknd")
+    return {
+        "destroy": d,
+    }
+
 def cli():
     """
     Drive the above functions from the command-line (i.e. locally instead of
@@ -115,11 +121,18 @@ def cli():
         xs = list_droplets()
         pprint.pp(xs)
 
+    def run_destroy_all():
+        r = destroy_all_droplets()
+        pprint.pp(r)
+
     parser = argparse.ArgumentParser(description="Ephemeral virtual machines in one command.")
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
     parser_list = subparsers.add_parser('list', help='List virtual machines')
     parser_list.set_defaults(func=lambda args: run_list())
+
+    parser_destroy_all = subparsers.add_parser('destroy-all', help='Destroy all virtual machines')
+    parser_destroy_all.set_defaults(func=lambda args: run_destroy_all())
 
     args = parser.parse_args()
     if hasattr(args, 'func'):

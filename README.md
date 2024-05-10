@@ -164,7 +164,9 @@ use `.ignore` files. If we want to include our library, we have to use
 `../../../lib/thebacknd/__init__.py` to be more explicit because then it drops
 the leading `thebacknd/` path.
 
+To run the same Python code that is used in the serverless functions locally:
+
 ```
 $ poetry install
-$ poetry run thebacknd
+$ poetry run thebacknd list
 ```
