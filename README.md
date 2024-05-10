@@ -168,5 +168,20 @@ To run the same Python code that is used in the serverless functions locally:
 
 ```
 $ poetry install
+$ poetry run thebacknd --help
 $ poetry run thebacknd list
+$ poetry run thebacknd create
+$ poetry run thebacknd destroy-all
+```
+
+# Virtual machine
+
+Within a virtual machine deployed using thebacknd base image, there are four
+helper scripts:
+
+```
+# current-system
+# desired-system
+# destroy-system
+# update-system
 ```
