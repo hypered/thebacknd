@@ -1,6 +1,18 @@
 let
   sources = import ./nix/sources.nix;
-  nixpkgs = import sources.nixpkgs {};
+  nixpkgs-mozilla = import sources.nixpkgs-mozilla;
+  pkgs = import sources.nixpkgs {
+    overlays = [
+      nixpkgs-mozilla
+    ];
+  };
+
+  toolchain = pkgs.latest.rustChannels.nightly.rust;
+
+  naersk = pkgs.callPackage sources.naersk {
+    cargo = toolchain;
+    rustc = toolchain;
+  };
 
   os = import "${toString sources.nixpkgs}/nixos/lib/eval-config.nix" {
     modules = [
@@ -17,16 +29,11 @@ let
     ];
   };
 
-  echo-hello = nixpkgs.writers.writeBashBin "echo-hello" ''
-    set -euo pipefail
-    echo Hello.
-  '';
-
 in rec
   {
     # Build with nix-build -A <attr>
     toplevel = os.config.system.build.toplevel;
     image = os.config.system.build.digitalOceanImage;
     runvm = qemu.config.system.build.vm;
-    binary = echo-hello;
+    binaries = naersk.buildPackage ./.;
   }
