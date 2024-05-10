@@ -1,5 +1,7 @@
 # Thebacknd
 
+Thebacknd runs ephemeral virtual machines in the cloud in one command.
+
 Thebacknd is a proof-of-concept to run a NixOS system as a DigitalOcean virtual
 machine in a single command.
 
@@ -194,4 +196,7 @@ spin a VM. Some code living in `src/` is supposed to replace it in the future.
 ```
 $ nix-shell -p cargo
 $ cargo run
+$ cargo doc
 ```
+
+Note: the documentation is built at `target/doc/thebacknd/index.html`.

@@ -1,7 +1,12 @@
+//! # Thebacknd
+//!
+//!  Thebacknd runs ephemeral virtual machines in the cloud in one command.
+
 use clap::{Parser, Subcommand};
 use std::process::{Command as ProcessCommand, exit};
 use regex::Regex;
 
+/// Thebacknd client-side binary main entry point.
 fn main() {
     let cli = Cli::parse();
 
@@ -19,9 +24,9 @@ fn main() {
                     format!("nix_binary:{}", full_path)
                 };
 
-                invoke_function(Some(&param), *verbose);
+                invoke_create(Some(&param), *verbose);
             } else {
-                invoke_function(None, *verbose);
+                invoke_create(None, *verbose);
             }
         }
     }
@@ -51,7 +56,8 @@ enum Commands {
     },
 }
 
-fn invoke_function(param: Option<&str>, verbose: bool) {
+/// Call the `thebacknd/create` serverless function using the `doctl` command-line tool.
+fn invoke_create(param: Option<&str>, verbose: bool) {
     let mut command = ProcessCommand::new("doctl");
     command.args(&["serverless", "functions", "invoke", "thebacknd/create"]);
 

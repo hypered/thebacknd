@@ -1,7 +1,12 @@
 [package]
 name = "thebacknd"
 version = "0.1.0"
+authors = ["Võ Minh Thu <thu@hypered.io>"]
 edition = "2021"
+license = "BSD-2-Clause"
+description = "Ephemeral virtual machines in the cloud in one command"
+repository = "https://github.com/hypered/thebacknd"
+readme = "README.md"
 
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"] }
