@@ -167,6 +167,15 @@ def destroy_all_droplets():
     }
 
 
+def destroy_self(vm_id, vm_killcode):
+    has_killcode = verify_killcode(vm_id, vm_killcode)
+    if has_killcode:
+        do_client.droplets.destroy_by_tag(tag_name=vm_id)
+        return {"destroyed": vm_id}
+    else:
+        return {}
+
+
 def cli():
     """
     Drive the above functions from the command-line (i.e. locally instead of
@@ -195,6 +204,10 @@ def cli():
         r = destroy_all_droplets()
         pprint.pp(r)
 
+    def run_destroy_self(vm_id, vm_killcode):
+        r = destroy_self(vm_id, vm_killcode)
+        pprint.pp(r)
+
     parser = argparse.ArgumentParser(description="Ephemeral virtual machines in one command.")
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
@@ -208,6 +221,11 @@ def cli():
 
     parser_destroy_all = subparsers.add_parser('destroy-all', help='Destroy all virtual machines')
     parser_destroy_all.set_defaults(func=lambda args: run_destroy_all())
+
+    parser_destroy_self = subparsers.add_parser('destroy-self', help='Destroy a virtual machine given a killcode')
+    parser_destroy_self.add_argument("--vm-id", type=str, help="Specify a virtual machine ID.")
+    parser_destroy_self.add_argument("--killcode", type=str, help="Specify a killcode.")
+    parser_destroy_self.set_defaults(func=lambda args: run_destroy_self(args.vm_id, args.killcode))
 
     args = parser.parse_args()
     if hasattr(args, 'func'):
