@@ -185,3 +185,13 @@ helper scripts:
 # destroy-system
 # update-system
 ```
+
+# Local binary
+
+The `scripts/thebacknd-run.sh` script tries to provide a user-friendly way to
+spin a VM. Some code living in `src/` is supposed to replace it in the future.
+
+```
+$ nix-shell -p cargo
+$ cargo run
+```
