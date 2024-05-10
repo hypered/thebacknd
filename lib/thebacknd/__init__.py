@@ -166,6 +166,14 @@ def destroy_all_droplets():
         "destroy": d,
     }
 
+def destroy_old_droplets():
+    xs = list_droplets()
+    r = {}
+    for k, v in xs.items():
+        if v["should_be_destroyed"] is True:
+            r[k] = do_client.droplets.destroy(k)
+    return r
+
 
 def destroy_self(vm_id, vm_killcode):
     has_killcode = verify_killcode(vm_id, vm_killcode)
@@ -204,6 +212,10 @@ def cli():
         r = destroy_all_droplets()
         pprint.pp(r)
 
+    def run_destroy_old():
+        r = destroy_old_droplets()
+        pprint.pp(r)
+
     def run_destroy_self(vm_id, vm_killcode):
         r = destroy_self(vm_id, vm_killcode)
         pprint.pp(r)
@@ -221,6 +233,9 @@ def cli():
 
     parser_destroy_all = subparsers.add_parser('destroy-all', help='Destroy all virtual machines')
     parser_destroy_all.set_defaults(func=lambda args: run_destroy_all())
+
+    parser_destroy_old = subparsers.add_parser('destroy-old', help='Destroy old virtual machines')
+    parser_destroy_old.set_defaults(func=lambda args: run_destroy_old())
 
     parser_destroy_self = subparsers.add_parser('destroy-self', help='Destroy a virtual machine given a killcode')
     parser_destroy_self.add_argument("--vm-id", type=str, help="Specify a virtual machine ID.")
