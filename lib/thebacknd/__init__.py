@@ -4,6 +4,7 @@
 import datetime
 import hmac
 import hashlib
+import json
 import os
 import pydo
 from types import SimpleNamespace
@@ -98,11 +99,73 @@ def list_droplets():
                 r[x["id"]]["debug"] = x
     return r
 
+
+# Find the smallest number (starting from 1) that is not in a given list.
+def smallest_missing_number(numbers):
+    current = 1
+    while True:
+        if current not in numbers:
+            return current
+        current += 1
+
+
+def existing_droplet_numbers():
+    xs = do_client.droplets.list(tag_name="thebacknd")
+    # The names looks like "thebacknd-123".
+    ns = [int(x["name"].split("-")[-1]) for x in xs["droplets"]]
+    return ns
+
+
+def create_droplet(nix_toplevel, nix_binary):
+    numbers = existing_droplet_numbers()
+    n = smallest_missing_number(numbers)
+    vm_id = create_vm_id()
+
+    user_data_content = {}
+    per_vm_secret = create_killcode(vm_id)
+    user_data_content["vm_id"] = vm_id
+    user_data_content["vm_killcode"] = per_vm_secret
+    # doctl serverless functions get thebacknd/destroy-self --url
+    # TODO Must be automatically discovered.
+    user_data_content[
+        "destroy_url"
+    ] = "https://faas-ams3-2a2df116.doserverless.co/api/v1/web/fn-85df16d9-63e4-4388-875f-28a44e683171/thebacknd/destroy-self"
+
+    if nix_toplevel:
+        user_data_content["nix_toplevel"] = nix_toplevel
+    if nix_binary:
+        user_data_content["nix_binary"] = nix_binary
+    user_data_content["nix_cache"] = conf.nix_cache
+    user_data_content["nix_trusted_key"] = conf.nix_trusted_key
+    user_data_content["nix_cache_key_id"] = conf.nix_cache_key_id
+    user_data_content["nix_cache_key_secret"] = conf.nix_cache_key_secret
+
+    droplet_req = {
+        "name": "thebacknd-{0}".format(n),
+        "region": conf.vm_region,
+        "size": conf.vm_size,
+        "image": conf.vm_image,
+        "ssh_keys": [ssh_key],
+        # We pass the file content with user_data instead of
+        # user_data_file because I don't know how to get content
+        # back within the VM. With user_data, we can simple query
+        # the metadata service at
+        # http://169.254.169.254/metadata/v1/user-data.
+        "user_data": json.dumps(user_data_content, indent=2),
+        "tags": ["thebacknd", vm_id],
+    }
+    c = do_client.droplets.create(body=droplet_req)
+    return {
+        "create": c,
+    }
+
+
 def destroy_all_droplets():
     d = do_client.droplets.destroy_by_tag(tag_name="thebacknd")
     return {
         "destroy": d,
     }
+
 
 def cli():
     """
@@ -121,6 +184,13 @@ def cli():
         xs = list_droplets()
         pprint.pp(xs)
 
+    def run_create(nix_toplevel, nix_binary):
+        r = create_droplet(
+            nix_toplevel=nix_toplevel,
+            nix_binary=nix_binary,
+        )
+        pprint.pp(r)
+
     def run_destroy_all():
         r = destroy_all_droplets()
         pprint.pp(r)
@@ -130,6 +200,11 @@ def cli():
 
     parser_list = subparsers.add_parser('list', help='List virtual machines')
     parser_list.set_defaults(func=lambda args: run_list())
+
+    parser_create = subparsers.add_parser('create', help='Create a virtual machine')
+    parser_create.add_argument("--toplevel", type=str, default=None, help="Specify a toplevel to deploy.")
+    parser_create.add_argument("--binary", type=str, default=None, help="Specify a binary to run.")
+    parser_create.set_defaults(func=lambda args: run_create(nix_toplevel=args.toplevel, nix_binary=args.binary))
 
     parser_destroy_all = subparsers.add_parser('destroy-all', help='Destroy all virtual machines')
     parser_destroy_all.set_defaults(func=lambda args: run_destroy_all())
