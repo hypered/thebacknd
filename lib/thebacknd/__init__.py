@@ -97,3 +97,8 @@ def list_droplets():
             if False:
                 r[x["id"]]["debug"] = x
     return r
+
+def cli():
+    print("Thebacknd.")
+    xs = list_droplets()
+    print(xs)

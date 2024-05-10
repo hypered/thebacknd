@@ -86,6 +86,7 @@ $ doctl serverless functions invoke thebacknd/list
 $ doctl serverless functions invoke thebacknd/create
 $ doctl serverless functions invoke thebacknd/destroy-all
 $ doctl serverless functions invoke thebacknd/destroy-old
+$ doctl serverless functions list
 ```
 
 There is also a `thebacknd/destroy-self` that is intended to be called by a
@@ -136,3 +137,34 @@ NIX_TRUSTED_KEY=
 ```
 
 Its values are templated into the `project.yml` file during the build.
+
+# Development
+
+Writing Python code locally to run it as serverless functions is a very bad
+development experience. I'm trying to wrap those functions in a normal Python
+project to more easily develop it locally. It means in practice that we have to
+both accomodate the structure required by the `doctl serverless` tool, and what
+`poetry` wants.
+
+To list what is deployed (this can show for instance that we failed to include
+the right files):
+
+```
+$ unzip -l packages/thebacknd/create/__deployer__.zip
+```
+
+Note: this might also show unwanted files, e.g.
+`thebacknd/__pycache__/__init__.cpython-310.pyc`. This is why we have to be
+carefull to clean our workspace before deploying.
+
+Note: the build system supports `.include` files. When using them, you can't
+use `.ignore` files. If we want to include our library, we have to use
+`../../../lib/thebackend`. Unfortunately this will pick up
+`../../../lib/thebacknd/__pycache__` if it exists, and we can't use
+`../../../lib/thebacknd/__init__.py` to be more explicit because then it drops
+the leading `thebacknd/` path.
+
+```
+$ poetry install
+$ poetry run thebacknd
+```

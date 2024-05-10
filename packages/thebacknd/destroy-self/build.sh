@@ -1,1 +1,0 @@
-cp ../../../lib/thebacknd.py .

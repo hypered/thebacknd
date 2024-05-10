@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "thebacknd"
+version = "0.1.0"
+description = "Ephemeral virtual machines in the cloud in one command."
+authors = ["Vo Minh Thu <thu@hypered.io>"]
+license = "BSD2"
+readme = "README.md"
+packages = [{include = "thebacknd", from = "lib/"}]
+
+[tool.poetry.scripts]
+thebacknd = 'thebacknd:cli'
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydo = "^0.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
