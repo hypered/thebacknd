@@ -188,6 +188,8 @@ helper scripts:
 # update-system
 ```
 
+Those will be replaced by symlinks to `thewithn`.
+
 # Local binary
 
 The `scripts/thebacknd-run.sh` script tries to provide a user-friendly way to
@@ -195,7 +197,7 @@ spin a VM. Some code living in `src/` is supposed to replace it in the future.
 
 ```
 $ nix-shell -p cargo
-$ cargo run
+$ cargo run --bin thebacknd
 $ cargo doc
 ```
 
