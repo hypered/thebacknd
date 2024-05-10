@@ -1,5 +1,5 @@
 # This is code that can be used by multiple "functions" within packages/.
-# It is copied at build-time by the build.sh scripts of each "function".
+# It is copied at build-time by the .include files of each "function".
 
 import datetime
 import hmac
@@ -99,6 +99,30 @@ def list_droplets():
     return r
 
 def cli():
-    print("Thebacknd.")
-    xs = list_droplets()
-    print(xs)
+    """
+    Drive the above functions from the command-line (i.e. locally instead of
+    remotely.
+
+    For instance the "list" code can be run with both these commands:
+
+        $ poetry run thebacknd list
+        $ doctl serverless functions invoke thebacknd/list
+    """
+    import argparse
+    import pprint
+
+    def run_list():
+        xs = list_droplets()
+        pprint.pp(xs)
+
+    parser = argparse.ArgumentParser(description="Ephemeral virtual machines in one command.")
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+
+    parser_list = subparsers.add_parser('list', help='List virtual machines')
+    parser_list.set_defaults(func=lambda args: run_list())
+
+    args = parser.parse_args()
+    if hasattr(args, 'func'):
+        args.func(args)
+    else:
+        parser.print_help()
