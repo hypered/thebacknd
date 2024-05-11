@@ -6,6 +6,7 @@
 
 use clap::{Parser, Subcommand};
 use std::env;
+use std::fs;
 use std::path::Path;
 
 /// Thewithn single binary main entry point.
@@ -73,9 +74,6 @@ enum Commands {
 
 #[derive(Parser)]
 struct CurrentSystemCmd {
-    /// Activate verbose mode
-    #[arg(short, long)]
-    verbose: bool,
 }
 
 #[derive(Parser)]
@@ -96,11 +94,11 @@ struct DestroySystemCmd {
 struct UpdateSystemCmd {
 }
 
-fn handle_current_system(args: &CurrentSystemCmd) {
-    if args.verbose {
-        println!("Called as 'current-system' with verbosity enabled.");
-    } else {
-        println!("Called as 'current-system'.");
+fn handle_current_system(_args: &CurrentSystemCmd) {
+    let current_system_link = "/run/current-system";
+    match fs::read_link(current_system_link) {
+        Ok(path) => println!("{}", path.display()),
+        Err(e) => eprintln!("Failed to read link {}: {}", current_system_link, e),
     }
 }
 
