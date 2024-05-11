@@ -36,4 +36,12 @@ in rec
     image = os.config.system.build.digitalOceanImage;
     runvm = qemu.config.system.build.vm;
     binaries = naersk.buildPackage ./.;
+
+    # A shell to try out our binaries
+    # Run with nix-shell default.nix -A shell
+    shell = pkgs.mkShell {
+      buildInputs = [
+        binaries
+      ];
+    };
   }
