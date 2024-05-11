@@ -11,24 +11,7 @@ fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::Run { full_path, verbose } => {
-            if let Some(full_path) = full_path {
-                let re = Regex::new(r"(/nix/store/[^/]+)/.+").unwrap();
-                let store_path = re.captures(full_path)
-                    .map(|caps| caps.get(1).unwrap().as_str())
-                    .unwrap_or(full_path);
-
-                let param = if full_path == store_path {
-                    format!("nix_toplevel:{}", store_path)
-                } else {
-                    format!("nix_binary:{}", full_path)
-                };
-
-                invoke_create(Some(&param), *verbose);
-            } else {
-                invoke_create(None, *verbose);
-            }
-        }
+        Commands::Run(cmd) => handle_run(cmd),
     }
 }
 
@@ -45,15 +28,38 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Run a toplevel or a binary in a cloud virtual machine
-    Run {
-        /// The full path to a binary or toplevel store path
-        full_path: Option<String>,
+    Run(RunCmd),
+}
 
-        /// Enable verbose output
-        #[arg(short, long)]
-        verbose: bool,
-    },
+/// Run a toplevel or a binary in a cloud virtual machine
+#[derive(Parser)]
+struct RunCmd {
+    /// The full path to a binary or toplevel store path
+    full_path: Option<String>,
+
+    /// Enable verbose output
+    #[arg(short, long)]
+    verbose: bool,
+}
+
+fn handle_run(args: &RunCmd) {
+    let RunCmd{ full_path, verbose } = args;
+    if let Some(full_path) = full_path {
+        let re = Regex::new(r"(/nix/store/[^/]+)/.+").unwrap();
+        let store_path = re.captures(full_path)
+            .map(|caps| caps.get(1).unwrap().as_str())
+            .unwrap_or(full_path);
+
+        let param = if full_path == store_path {
+            format!("nix_toplevel:{}", store_path)
+        } else {
+            format!("nix_binary:{}", full_path)
+        };
+
+        invoke_create(Some(&param), *verbose);
+    } else {
+        invoke_create(None, *verbose);
+    }
 }
 
 /// Call the `thebacknd/create` serverless function using the `doctl` command-line tool.
