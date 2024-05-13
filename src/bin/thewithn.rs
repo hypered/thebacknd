@@ -4,10 +4,13 @@
 //! thebacknd. The different commands are supposed to be symlinks to this single binary, which acts
 //! differently depending on the symlink name.
 
-use clap::{Parser, Subcommand};
+use clap::{Parser};
 use std::env;
 use std::fs;
 use std::path::Path;
+
+use thebacknd::agent::cli::{Cli, Commands};
+use thebacknd::agent::cli;
 
 /// Thewithn single binary main entry point.
 fn main() {
@@ -36,19 +39,19 @@ fn main() {
 
         match invoked_as {
             "current-system" => {
-                let sub_args = CurrentSystemCmd::parse_from(args);
+                let sub_args = cli::CurrentSystemCmd::parse_from(args);
                 handle_current_system(&sub_args);
             }
             "desired-system" => {
-                let sub_args = DesiredSystemCmd::parse_from(args);
+                let sub_args = cli::DesiredSystemCmd::parse_from(args);
                 handle_desired_system(&sub_args);
             }
             "destroy-system" => {
-                let sub_args = DestroySystemCmd::parse_from(args);
+                let sub_args = cli::DestroySystemCmd::parse_from(args);
                 handle_destroy_system(&sub_args);
             }
             "update-system" => {
-                let sub_args = UpdateSystemCmd::parse_from(args);
+                let sub_args = cli::UpdateSystemCmd::parse_from(args);
                 handle_update_system(&sub_args);
             }
             _ => println!("Unknown symlink name: {}", invoked_as),
@@ -56,45 +59,7 @@ fn main() {
     }
 }
 
-#[derive(Parser)]
-#[command(name = "thewithn")]
-#[command(about = "A program that behaves differently based on the symlink name or subcommands")]
-struct Cli {
-    #[command(subcommand)]
-    command: Option<Commands>,
-}
-
-#[derive(Subcommand)]
-enum Commands {
-    CurrentSystem(CurrentSystemCmd),
-    DesiredSystem(DesiredSystemCmd),
-    DestroySystem(DestroySystemCmd),
-    UpdateSystem(UpdateSystemCmd),
-}
-
-#[derive(Parser)]
-struct CurrentSystemCmd {
-}
-
-#[derive(Parser)]
-struct DesiredSystemCmd {
-    /// Provide a custom message
-    #[arg(short, long, default_value = "Called as 'desired-system'.")]
-    message: String,
-}
-
-#[derive(Parser)]
-struct DestroySystemCmd {
-    /// Print extra details
-    #[arg(short, long)]
-    details: bool,
-}
-
-#[derive(Parser)]
-struct UpdateSystemCmd {
-}
-
-fn handle_current_system(_args: &CurrentSystemCmd) {
+fn handle_current_system(_args: &cli::CurrentSystemCmd) {
     let current_system_link = "/run/current-system";
     match fs::read_link(current_system_link) {
         Ok(path) => println!("{}", path.display()),
@@ -102,11 +67,11 @@ fn handle_current_system(_args: &CurrentSystemCmd) {
     }
 }
 
-fn handle_desired_system(args: &DesiredSystemCmd) {
+fn handle_desired_system(args: &cli::DesiredSystemCmd) {
     println!("{}", args.message);
 }
 
-fn handle_destroy_system(args: &DestroySystemCmd) {
+fn handle_destroy_system(args: &cli::DestroySystemCmd) {
     if args.details {
         println!("Called as 'destroy-system' with extra details.");
     } else {
@@ -114,6 +79,6 @@ fn handle_destroy_system(args: &DestroySystemCmd) {
     }
 }
 
-fn handle_update_system(_args: &UpdateSystemCmd) {
+fn handle_update_system(_args: &cli::UpdateSystemCmd) {
     println!("Called as 'update-system'.");
 }
