@@ -1,31 +1,39 @@
 # Thebacknd
 
-Thebacknd runs ephemeral virtual machines in the cloud in one command.
-
-Thebacknd is a proof-of-concept to run a NixOS system as a DigitalOcean virtual
-machine in a single command.
+Thebacknd is a proof-of-concept to run a NixOS system as an ephemeral
+DigitalOcean virtual machine in a single command:
 
 ```
-$ scripts/build-toplevels.sh
-/nix/store/lk6igl2f0i137q36wscfrc6n9r0jn52l-nixos-system-unnamed-23.05pre-git
-$ scripts/thebacknd-run /nix/store/lk6igl2f0i137q36wscfrc6n9r0jn52l-nixos-system-unnamed-23.05pre-git
+$ thebacknd run -A toplevels.example
 ```
 
-The first script is responsible to build the toplevel derivation, and also sign
-its closure and push it to a binary cache. The Nix store path is then
-displayed. This is pretty standard NixOS stuff; nothing new here.
-
-The second command takes a Nix store path to a toplevel that should exist in a
-binary cache. It creates a DigitalOcean virtual machine, then switches it base
-NixOs system to the given toplevel.
+This builds, signs, and pushes to a binary cache the Nix attribute
+`toplevels.example` defined in the `default.nix` file present in the current
+working directory. It then creates a DigitalOcean virtual machine, and switches
+its base NixOs system to the given toplevel.
 
 # Variants
 
-The `scripts/thebacknd-run` can also be run without an argument. The resulting
-virtual machine uses the base image without switching to a new toplevel.
+```
+$ thebacknd run /nix/store/qqzn1jfjgxipzz4g4qqvv5cilk0x0hy7-nixos-system-unnamed-23.05pre-git
+$ thebacknd run /nix/store/r7cylmrxj0nj2901vy33wqnfdflaf7fb-program-0.1.0/bin/program
+$ thebacknd run
+$ thebacknd run --A toplevels.base
+$ thebacknd run --attr toplevels.base
+$ thebacknd run default.nix --attr toplevels.base
+```
 
-It can also be given a path to a binary withing the Nix store. Again, this uses
-the base image.
+The first call doesn't build or sign anything. It only takes a Nix store path
+that is expected to be existing (and signed) in the binary cache, and uses it
+as the desired system.
+
+It can also be given a path to a binary within the Nix store. Again, this uses
+the base image, and it runs the binary once the machine has booted.
+
+It can also be run without an argument. The resulting virtual machine uses the
+base image without switching to a new toplevel. This is similar to `thebacknd
+run -A toplevels.base`, except it picks a pre-made base image from DigitalOcean
+custom images, instead of building it.
 
 In the future, I'd like to experiment with loading a Nix shell, or to build a
 toplevel from a Git repository. In that case, building it could be done either

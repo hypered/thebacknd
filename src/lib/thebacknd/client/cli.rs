@@ -20,8 +20,13 @@ pub enum Commands {
 /// Run a toplevel or a binary in a cloud virtual machine
 #[derive(Parser)]
 pub struct RunCmd {
-    /// The full path to a binary or toplevel store path
+    /// The full path to a binary or toplevel store path, or to a Nix file (when an attribute is
+    /// given).
     pub full_path: Option<String>,
+
+    /// The attribute path to build
+    #[arg(short = 'A', long)]
+    pub attr: Option<String>,
 
     /// Enable verbose output
     #[arg(short, long)]
