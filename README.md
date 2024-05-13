@@ -6,7 +6,7 @@ Thebacknd is a proof-of-concept to run a NixOS system as a DigitalOcean virtual
 machine in a single command.
 
 ```
-$ scripts/build-toplevel.sh
+$ scripts/build-toplevels.sh
 /nix/store/lk6igl2f0i137q36wscfrc6n9r0jn52l-nixos-system-unnamed-23.05pre-git
 $ scripts/thebacknd-run /nix/store/lk6igl2f0i137q36wscfrc6n9r0jn52l-nixos-system-unnamed-23.05pre-git
 ```
