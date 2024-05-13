@@ -2,9 +2,11 @@
 //!
 //!  Thebacknd runs ephemeral virtual machines in the cloud in one command.
 
-use clap::{Parser, Subcommand};
+use clap::{Parser};
 use std::process::{Command as ProcessCommand, exit};
 use regex::Regex;
+
+use thebacknd::client::cli::{Cli, Commands, RunCmd};
 
 /// Thebacknd client-side binary main entry point.
 fn main() {
@@ -13,33 +15,6 @@ fn main() {
     match &cli.command {
         Commands::Run(cmd) => handle_run(cmd),
     }
-}
-
-#[derive(Parser)]
-#[command(
-    version = "0.1.0",
-    author = "Võ Minh Thu <thu@hypered.io>",
-    about = "Ephemeral virtual machines in the cloud in one command"
-)]
-struct Cli {
-    #[command(subcommand)]
-    command: Commands,
-}
-
-#[derive(Subcommand)]
-enum Commands {
-    Run(RunCmd),
-}
-
-/// Run a toplevel or a binary in a cloud virtual machine
-#[derive(Parser)]
-struct RunCmd {
-    /// The full path to a binary or toplevel store path
-    full_path: Option<String>,
-
-    /// Enable verbose output
-    #[arg(short, long)]
-    verbose: bool,
 }
 
 fn handle_run(args: &RunCmd) {

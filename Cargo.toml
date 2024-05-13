@@ -11,3 +11,15 @@ readme = "README.md"
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"] }
 regex = "1.10.4"
+
+[[bin]]
+name = "thebacknd"
+path = "src/bin/thebacknd.rs"
+
+[[bin]]
+name = "thewithn"
+path = "src/bin/thewithn.rs"
+
+[lib]
+name = "thebacknd"
+path = "src/lib/thebacknd/lib.rs"
