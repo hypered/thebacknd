@@ -19,8 +19,8 @@ $ thebacknd run /nix/store/qqzn1jfjgxipzz4g4qqvv5cilk0x0hy7-nixos-system-unnamed
 $ thebacknd run /nix/store/r7cylmrxj0nj2901vy33wqnfdflaf7fb-program-0.1.0/bin/program
 $ thebacknd run
 $ thebacknd run --A toplevels.base
-$ thebacknd run --attr toplevels.base
-$ thebacknd run default.nix --attr toplevels.base
+$ thebacknd run --attr toplevels.example
+$ thebacknd run default.nix --attr toplevels.nginx
 ```
 
 The first call doesn't build or sign anything. It only takes a Nix store path

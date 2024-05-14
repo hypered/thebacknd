@@ -14,6 +14,7 @@ in
   services.getty.autologinUser = lib.mkDefault "root";
 
   systemd.services.update-system = {
+    description = "Switch to the toplevel referenced in user-data, or run its binary.";
     after = [ "network-online.target" ];
     requires = [ "network-online.target" ];
     wantedBy = [ "multi-user.target" ];

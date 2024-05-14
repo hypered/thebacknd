@@ -65,3 +65,8 @@ nix-store -r "${TOPLEVEL}" \
 echo Activating copied toplevel...
 nix-env --profile /nix/var/nix/profiles/system --set "${TOPLEVEL}"
 /nix/var/nix/profiles/system/bin/switch-to-configuration switch
+
+# TODO I don't know why Nginx is not started when switching to toplevels.nginx.
+# We start it manually for now. This is ugly, for instance in the
+# toplevels.example case where Nginx doesn't exist.
+systemctl start nginx

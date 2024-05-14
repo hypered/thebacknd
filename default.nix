@@ -37,11 +37,20 @@ let
     ];
   };
 
+  nginx = import "${toString sources.nixpkgs}/nixos/lib/eval-config.nix" {
+    modules = [
+      "${toString sources.nixpkgs}/nixos/modules/virtualisation/digital-ocean-image.nix"
+      ./machines/base/configuration.nix
+      ./machines/nginx/nginx.nix
+    ];
+  };
+
 in rec
   {
     # Build with nix-build -A <attr>
     toplevels.base = base.config.system.build.toplevel;
     toplevels.example = example.config.system.build.toplevel;
+    toplevels.nginx = nginx.config.system.build.toplevel;
     image = base.config.system.build.digitalOceanImage;
     runvm = qemu.config.system.build.vm;
     binaries = naersk.buildPackage ./.;
