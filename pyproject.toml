@@ -13,6 +13,7 @@ thebacknd = 'thebacknd:cli'
 [tool.poetry.dependencies]
 python = "^3.11"
 pydo = "^0.2.0"
+boto3 = "^1.34.139"
 
 
 [build-system]

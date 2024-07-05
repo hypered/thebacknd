@@ -1,6 +1,7 @@
 # This is code that can be used by multiple "functions" within packages/.
 # It is copied at build-time by the .include files of each "function".
 
+import boto3
 import datetime
 import hmac
 import hashlib
@@ -13,6 +14,13 @@ import uuid
 # Environment variables are set in project.yml. In project.yml, they can be
 # templated from a .env file. Don't write secrets directly in project.yml.
 do_client = pydo.Client(token=os.getenv("DIGITALOCEAN_ACCESS_TOKEN"))
+
+s3_client = boto3.client(
+    "s3",
+    aws_access_key_id=os.getenv("THEBACKND_ONCE_KEY_ID"),
+    aws_secret_access_key=os.getenv("THEBACKND_ONCE_KEY_SECRET"),
+    endpoint_url="https://ams3.digitaloceanspaces.com",
+)
 
 # Fingerprint or ID of an SSH key to embed in a created virtual machine. Must
 # already be known from DigitalOcean.
@@ -38,6 +46,9 @@ conf.nix_cache = os.getenv("NIX_CACHE")
 conf.nix_trusted_key = os.getenv("NIX_TRUSTED_KEY")
 conf.nix_cache_key_id = os.getenv("NIX_CACHE_KEY_ID")
 conf.nix_cache_key_secret = os.getenv("NIX_CACHE_KEY_SECRET")
+
+# Bucket name to store the one-time-urls content.
+conf.once_bucket_name = "thebacknd"
 
 
 # Generate VM ID. (DigitalOcean will also create one, but we'll know it only
@@ -166,6 +177,7 @@ def destroy_all_droplets():
         "destroy": d,
     }
 
+
 def destroy_old_droplets():
     xs = list_droplets()
     r = {}
@@ -182,6 +194,25 @@ def destroy_self(vm_id, vm_killcode):
         return {"destroyed": vm_id}
     else:
         return {}
+
+
+# Store a string in S3, returning a hard-to-guess key.
+def put_once_content(value):
+    date_str = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d")
+    key = f"once/{date_str}/{uuid.uuid4()}"
+    s3_client.put_object(Bucket=conf.once_bucket_name, Key=key, Body=value)
+    return key
+
+
+# Retrieve a string from S3 using its key, and delete it from S3.
+def get_once_content(key):
+    try:
+        response = s3_client.get_object(Bucket=conf.once_bucket_name, Key=key)
+        value = response["Body"].read().decode("utf-8")
+        s3_client.delete_object(Bucket=conf.once_bucket_name, Key=key)
+        return value
+    except s3_client.exceptions.NoSuchKey:
+        return None
 
 
 def cli():
