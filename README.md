@@ -185,6 +185,14 @@ $ poetry run thebacknd create
 $ poetry run thebacknd destroy-all
 ```
 
+To load that code in an interactive Python interpreter:
+
+```
+$ poetry shell
+$ python -i lib/thebacknd/__init__.py
+>>> create_killcode("some-id")
+```
+
 # Virtual machine
 
 Within a virtual machine deployed using thebacknd base image, there are four
