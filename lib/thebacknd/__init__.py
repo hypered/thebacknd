@@ -251,30 +251,48 @@ def cli():
         r = destroy_self(vm_id, vm_killcode)
         pprint.pp(r)
 
-    parser = argparse.ArgumentParser(description="Ephemeral virtual machines in one command.")
-    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+    parser = argparse.ArgumentParser(
+        description="Ephemeral virtual machines in one command."
+    )
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
-    parser_list = subparsers.add_parser('list', help='List virtual machines')
+    parser_list = subparsers.add_parser("list", help="List virtual machines")
     parser_list.set_defaults(func=lambda args: run_list())
 
-    parser_create = subparsers.add_parser('create', help='Create a virtual machine')
-    parser_create.add_argument("--toplevel", type=str, default=None, help="Specify a toplevel to deploy.")
-    parser_create.add_argument("--binary", type=str, default=None, help="Specify a binary to run.")
-    parser_create.set_defaults(func=lambda args: run_create(nix_toplevel=args.toplevel, nix_binary=args.binary))
+    parser_create = subparsers.add_parser("create", help="Create a virtual machine")
+    parser_create.add_argument(
+        "--toplevel", type=str, default=None, help="Specify a toplevel to deploy."
+    )
+    parser_create.add_argument(
+        "--binary", type=str, default=None, help="Specify a binary to run."
+    )
+    parser_create.set_defaults(
+        func=lambda args: run_create(nix_toplevel=args.toplevel, nix_binary=args.binary)
+    )
 
-    parser_destroy_all = subparsers.add_parser('destroy-all', help='Destroy all virtual machines')
+    parser_destroy_all = subparsers.add_parser(
+        "destroy-all", help="Destroy all virtual machines"
+    )
     parser_destroy_all.set_defaults(func=lambda args: run_destroy_all())
 
-    parser_destroy_old = subparsers.add_parser('destroy-old', help='Destroy old virtual machines')
+    parser_destroy_old = subparsers.add_parser(
+        "destroy-old", help="Destroy old virtual machines"
+    )
     parser_destroy_old.set_defaults(func=lambda args: run_destroy_old())
 
-    parser_destroy_self = subparsers.add_parser('destroy-self', help='Destroy a virtual machine given a killcode')
-    parser_destroy_self.add_argument("--vm-id", type=str, help="Specify a virtual machine ID.")
+    parser_destroy_self = subparsers.add_parser(
+        "destroy-self", help="Destroy a virtual machine given a killcode"
+    )
+    parser_destroy_self.add_argument(
+        "--vm-id", type=str, help="Specify a virtual machine ID."
+    )
     parser_destroy_self.add_argument("--killcode", type=str, help="Specify a killcode.")
-    parser_destroy_self.set_defaults(func=lambda args: run_destroy_self(args.vm_id, args.killcode))
+    parser_destroy_self.set_defaults(
+        func=lambda args: run_destroy_self(args.vm_id, args.killcode)
+    )
 
     args = parser.parse_args()
-    if hasattr(args, 'func'):
+    if hasattr(args, "func"):
         args.func(args)
     else:
         parser.print_help()
