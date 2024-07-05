@@ -42,7 +42,7 @@ becomes optional.
 
 # Components
 
-Thebacknd stiches together a few pieces:
+Thebacknd stitches together a few pieces:
 
 - A set of "serverless" "functions" for creating ephemeral virtual machines
   within DigitalOcean. This acts as a service that can talk to the DigitalOcean
@@ -54,7 +54,7 @@ Thebacknd stiches together a few pieces:
 
   This could easily be replaced by a small virtual machine. One advantage the
   "serverless" "functions" have is that they can "scale to zero" (they don't
-  inccur any costs when they are unused), while still being ready to accept
+  incur any costs when they are unused), while still being ready to accept
   calls.
 
   Another advantage "functions" have is that they can also be scheduled, which
@@ -65,7 +65,7 @@ Thebacknd stiches together a few pieces:
 
 - A custom base image. This is a fairly standard NixOS image with one
   difference: it reads some data to know to which toplevel it should switch to,
-  and switch to it at startup.
+  and switches to it at startup.
 
 - An S3-compatible Nix binary cache. The custom image fetches the toplevel from
   the cache instead of building it.
@@ -80,7 +80,7 @@ the binary cache after building the toplevel, than to pull from it within the
 virtual machines.
 
 Note: The current proof-of-concept passes the read-only credentials to the
-virtual machine using the could-init user-data mechanism. This is easily
+virtual machine using the cloud-init user-data mechanism. This is easily
 readable by any code running in the virtual machine, so a better mechanism
 should be used. Unfortunately this would involve adding another state to the
 service.
@@ -146,7 +146,8 @@ NIX_CACHE=
 NIX_TRUSTED_KEY=
 ```
 
-Its values are templated into the `project.yml` file during the build.
+Its values are templated into the `project.yml` file during the build and
+deployment of the serverless functions.
 
 # Development
 
