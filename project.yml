@@ -21,34 +21,38 @@ packages:
           runtime: python:3.11
           web: false
           webSecure: false
+          limits:
+            timeout: 10000
           parameters: {}
           annotations: {}
-          limits:
-            timeout: 5000
         - name: list
           binary: false
           main: ""
           runtime: python:3.11
           web: true
           webSecure: false
+          limits:
+            timeout: 10000
           parameters: {}
           annotations: {}
-          limits: {}
         - name: destroy-all
           binary: false
           main: ""
           runtime: python:3.11
           web: false
           webSecure: false
+          limits:
+            timeout: 10000
           parameters: {}
           annotations: {}
-          limits: {}
         - name: destroy-old
           binary: false
           main: ""
           runtime: python:3.11
           web: false
           webSecure: false
+          limits:
+            timeout: 10000
           triggers:
             - name: trigger-destroy-old
               sourceType: scheduler
@@ -59,3 +63,12 @@ packages:
           runtime: python:3.11
           web: true
           webSecure: false
+          limits:
+            timeout: 10000
+        - name: once
+          binary: false
+          runtime: python:3.11
+          web: true
+          webSecure: false
+          limits:
+            timeout: 10000

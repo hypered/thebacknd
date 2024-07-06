@@ -19,8 +19,6 @@ nix store sign \
   --key-file signing-keys/cache-priv-key.pem \
   $(readlink ./result-binaries)
 
-exit 0
-
 set -a
 source .env-nix-build
 set +a

@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import pydo
+import secrets
 from types import SimpleNamespace
 import uuid
 
@@ -28,7 +29,7 @@ ssh_key = os.getenv("EMBED_SSH_KEY")
 
 # A secret known from thebacknd, from which to derive per-vm secrets, used by
 # the VMs to request to be destroyed.
-secret = os.getenv("THEBACKND_SECRET")
+main_secret = os.getenv("THEBACKND_SECRET")
 
 # Things should be configurable. I guess we'll need to update the build.sh
 # scripts to copy some user-defined Python code or JSON file, or whatever
@@ -59,7 +60,7 @@ def create_vm_id():
 
 # Per-VM secret derived from the main secret above, associated to a given VM ID.
 def create_killcode(vm_id):
-    secret_bytes = secret.encode()
+    secret_bytes = main_secret.encode()
     identifier_bytes = vm_id.encode()
     hmac_obj = hmac.new(secret_bytes, identifier_bytes, hashlib.sha256)
     per_vm_secret = hmac_obj.hexdigest()
@@ -132,25 +133,26 @@ def create_droplet(nix_toplevel, nix_binary):
     n = smallest_missing_number(numbers)
     vm_id = create_vm_id()
 
-    user_data_content = {}
+    system_input = {}
     per_vm_secret = create_killcode(vm_id)
-    user_data_content["vm_id"] = vm_id
-    user_data_content["vm_killcode"] = per_vm_secret
-    # doctl serverless functions get thebacknd/destroy-self --url
-    # TODO Must be automatically discovered.
-    user_data_content[
-        "destroy_url"
-    ] = "https://faas-ams3-2a2df116.doserverless.co/api/v1/web/fn-85df16d9-63e4-4388-875f-28a44e683171/thebacknd/destroy-self"
+    system_input["vm_id"] = vm_id
+    system_input["vm_killcode"] = per_vm_secret
 
     if nix_toplevel:
-        user_data_content["nix_toplevel"] = nix_toplevel
+        system_input["nix_toplevel"] = nix_toplevel
     if nix_binary:
-        user_data_content["nix_binary"] = nix_binary
-    user_data_content["nix_cache"] = conf.nix_cache
-    user_data_content["nix_trusted_key"] = conf.nix_trusted_key
-    user_data_content["nix_cache_key_id"] = conf.nix_cache_key_id
-    user_data_content["nix_cache_key_secret"] = conf.nix_cache_key_secret
+        system_input["nix_binary"] = nix_binary
 
+    key = put_once_content(system_input)
+
+    user_data_content = {}
+    user_data_content["system_input_key"] = key
+    user_data_content[
+        "once_url"
+    ] = "https://faas-ams3-2a2df116.doserverless.co/api/v1/web/fn-85df16d9-63e4-4388-875f-28a44e683171/thebacknd/once"
+    user_data_json = json.dumps(user_data_content, indent=2)
+
+    print(f"Creating droplet with image {conf.vm_image}...")
     droplet_req = {
         "name": "thebacknd-{0}".format(n),
         "region": conf.vm_region,
@@ -162,13 +164,31 @@ def create_droplet(nix_toplevel, nix_binary):
         # back within the VM. With user_data, we can simple query
         # the metadata service at
         # http://169.254.169.254/metadata/v1/user-data.
-        "user_data": json.dumps(user_data_content, indent=2),
+        "user_data": user_data_json,
         "tags": ["thebacknd", vm_id],
     }
     c = do_client.droplets.create(body=droplet_req)
     return {
         "create": c,
     }
+
+
+# Retrieved the dict saved to S3 in create_droplet, augmented with credentials.
+def get_system_input(key):
+    system_input = get_once_content(key)
+    if system_input is None:
+        return None
+
+    # doctl serverless functions get thebacknd/destroy-self --url
+    # TODO Must be automatically discovered.
+    system_input[
+        "destroy_url"
+    ] = "https://faas-ams3-2a2df116.doserverless.co/api/v1/web/fn-85df16d9-63e4-4388-875f-28a44e683171/thebacknd/destroy-self"
+    system_input["nix_cache"] = conf.nix_cache
+    system_input["nix_trusted_key"] = conf.nix_trusted_key
+    system_input["nix_cache_key_id"] = conf.nix_cache_key_id
+    system_input["nix_cache_key_secret"] = conf.nix_cache_key_secret
+    return system_input
 
 
 def destroy_all_droplets():
@@ -196,21 +216,22 @@ def destroy_self(vm_id, vm_killcode):
         return {}
 
 
-# Store a string in S3, returning a hard-to-guess key.
+# Store a dict to S3, returning a hard-to-guess key.
 def put_once_content(value):
     date_str = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d")
-    key = f"once/{date_str}/{uuid.uuid4()}"
-    s3_client.put_object(Bucket=conf.once_bucket_name, Key=key, Body=value)
+    key = f"once/{date_str}/{secrets.token_hex()}"
+    value_json = json.dumps(value, indent=2)
+    s3_client.put_object(Bucket=conf.once_bucket_name, Key=key, Body=value_json)
     return key
 
 
-# Retrieve a string from S3 using its key, and delete it from S3.
+# Retrieve a dict from S3 using its key, and delete it from S3.
 def get_once_content(key):
     try:
         response = s3_client.get_object(Bucket=conf.once_bucket_name, Key=key)
         value = response["Body"].read().decode("utf-8")
         s3_client.delete_object(Bucket=conf.once_bucket_name, Key=key)
-        return value
+        return json.loads(value)
     except s3_client.exceptions.NoSuchKey:
         return None
 

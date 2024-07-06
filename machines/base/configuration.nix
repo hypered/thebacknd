@@ -30,6 +30,7 @@ in
     scripts.desired-system
     scripts.destroy-system
     scripts.update-system
+    scripts.system-input
     pkgs.jq
   ];
 }

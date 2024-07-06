@@ -79,11 +79,11 @@ Note: In our example scripts, we use a different set of credentials to push to
 the binary cache after building the toplevel, than to pull from it within the
 virtual machines.
 
-Note: The current proof-of-concept passes the read-only credentials to the
-virtual machine using the cloud-init user-data mechanism. This is easily
-readable by any code running in the virtual machine, so a better mechanism
-should be used. Unfortunately this would involve adding another state to the
-service.
+Note: The credentials can be retrieved from within the virtual machine by the
+`system-input` script. It writes them in a file called `system-input.json`
+after downloading them using a one-time-url. The one-time-url is passed to the
+virtual machine using the cloud-init user-data mechanism. `system-input` is
+called by `update-system`.
 
 # Usage
 
@@ -116,6 +116,13 @@ period, but this may change afterwards.
 
 It can take less than 300ms to run, but will sometimes reach its 3000ms
 timeout. Maybe it would be wise to increase it a bit.
+
+We also have "thebacknd/once" to retrieve VM configuration through
+`system-input`, but this is not supposed to be called manually.
+
+```
+$ doctl serverless functions invoke thebacknd/once --param "key:once/2024-07-05/da738b66-5fc1-4cd7-9f65-58b30c339d21"
+```
 
 # Configuration
 
@@ -195,10 +202,11 @@ $ python -i lib/thebacknd/__init__.py
 
 # Virtual machine
 
-Within a virtual machine deployed using thebacknd base image, there are four
+Within a virtual machine deployed using thebacknd base image, there are five
 helper scripts:
 
 ```
+# system-input
 # current-system
 # desired-system
 # destroy-system

@@ -8,16 +8,17 @@
 
 set -euo pipefail
 
-curl -s http://169.254.169.254/metadata/v1/user-data > user-data.json
+cd /root
+system-input
 
-TOPLEVEL=$(jq -r '.nix_toplevel // empty' user-data.json)
-TOPLEVEL_URL=$(jq -r '.nix_toplevel_url // empty' user-data.json)
-BINARY=$(jq -r '.nix_binary // empty' user-data.json)
+TOPLEVEL=$(jq -r '.nix_toplevel // empty' system-input.json)
+TOPLEVEL_URL=$(jq -r '.nix_toplevel_url // empty' system-input.json)
+BINARY=$(jq -r '.nix_binary // empty' system-input.json)
 
-NIX_CACHE=$(jq -r '.nix_cache // empty' user-data.json)
-NIX_TRUSTED_KEY=$(jq -r '.nix_trusted_key // empty' user-data.json)
-export AWS_ACCESS_KEY_ID=$(jq -r '.nix_cache_key_id // empty' user-data.json)
-export AWS_SECRET_ACCESS_KEY=$(jq -r '.nix_cache_key_secret // empty' user-data.json)
+NIX_CACHE=$(jq -r '.nix_cache // empty' system-input.json)
+NIX_TRUSTED_KEY=$(jq -r '.nix_trusted_key // empty' system-input.json)
+export AWS_ACCESS_KEY_ID=$(jq -r '.nix_cache_key_id // empty' system-input.json)
+export AWS_SECRET_ACCESS_KEY=$(jq -r '.nix_cache_key_secret // empty' system-input.json)
 
 # Force TOPLEVEL from the command-line argument.
 if [ -n "${1-}" ]; then
