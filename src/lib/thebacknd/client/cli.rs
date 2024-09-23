@@ -1,5 +1,6 @@
 /// Command-line definition for thebacknd client binary.
 use clap::{Parser, Subcommand};
+use clap_complete::{Shell};
 
 #[derive(Parser)]
 #[command(
@@ -8,6 +9,9 @@ use clap::{Parser, Subcommand};
     about = "Ephemeral virtual machines in the cloud in one command"
 )]
 pub struct Cli {
+    // If provided, outputs the completion file for given shell
+    #[arg(long = "generate", value_enum)]
+    pub generator: Option<Shell>,
     #[command(subcommand)]
     pub command: Commands,
 }

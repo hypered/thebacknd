@@ -61,5 +61,8 @@ in rec
       buildInputs = [
         binaries
       ];
+      shellHook = ''
+        source <(thebacknd --generate bash run)
+      '';
     };
   }
